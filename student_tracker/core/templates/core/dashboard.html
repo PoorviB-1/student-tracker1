@@ -1,0 +1,160 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Dashboard - Student Tracker{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- STATISTICS SECTION -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card gradient-blue">
+            <i class="bi bi-people-fill"></i>
+            <h3>{{ total_students }}</h3>
+            <p>Total Students</p>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card gradient-purple">
+            <i class="bi bi-book-fill"></i>
+            <h3>{{ total_courses }}</h3>
+            <p>Active Courses</p>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card gradient-cyan">
+            <i class="bi bi-calendar-check"></i>
+            <h3>{{ today_attendance }}</h3>
+            <p>Today's Attendance</p>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card gradient-green">
+            <i class="bi bi-graph-up"></i>
+            <h3>{{ recent_performances|length }}</h3>
+            <p>Recent Records</p>
+        </div>
+    </div>
+</div>
+
+<!-- QUICK ACTIONS -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-lightning-fill"></i> Quick Actions
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="/admin/core/student/add/" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Add Student
+                    </a>
+                    <a href="/admin/core/course/add/" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Add Course
+                    </a>
+                    <a href="/admin/core/attendance/add/" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Record Attendance
+                    </a>
+                    <a href="/admin/core/performance/add/" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Record Performance
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- RECENT DATA SECTION -->
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-people-fill"></i> Recent Students
+            </div>
+            <div class="card-body">
+                {% if recent_students %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Roll No</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in recent_students %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ student.roll_number }}</strong>
+                                        </td>
+                                        <td>{{ student.full_name }}</td>
+                                        <td>
+                                            <small class="text-muted">{{ student.email }}</small>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'core:student_detail' student.roll_number %}" class="btn btn-sm btn-info">
+                                                <i class="bi bi-eye"></i> View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info mb-0">
+                        <i class="bi bi-info-circle"></i>
+                        <span>No students enrolled yet.</span>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-bar-chart"></i> Recent Performance Records
+            </div>
+            <div class="card-body">
+                {% if recent_performances %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Course</th>
+                                    <th>Assessment</th>
+                                    <th>Grade</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for performance in recent_performances %}
+                                    <tr>
+                                        <td>{{ performance.student.full_name }}</td>
+                                        <td>
+                                            <strong>{{ performance.course.code }}</strong>
+                                        </td>
+                                        <td>
+                                            <small>{{ performance.assessment_name }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">{{ performance.grade }}</span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info mb-0">
+                        <i class="bi bi-info-circle"></i>
+                        <span>No performance records yet.</span>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

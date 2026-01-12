@@ -1,0 +1,129 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Students - Student Tracker{% endblock %}
+{% block page_title %}Students List{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+            <i class="bi bi-people-fill"></i> All Students
+        </div>
+        <a href="/admin/core/student/add/" class="btn btn-success btn-sm">
+            <i class="bi bi-plus-circle"></i> Add Student
+        </a>
+    </div>
+    
+    <div class="card-body">
+        <!-- SEARCH SECTION -->
+        <div class="search-box">
+            <form method="get" class="row g-2">
+                <div class="col-md-10">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input 
+                            type="text" 
+                            name="search" 
+                            class="form-control" 
+                            placeholder="Search by name, roll number, or email..."
+                            value="{{ search_query }}"
+                        >
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- STUDENTS TABLE -->
+        {% if students %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th><i class="bi bi-hash"></i> Roll Number</th>
+                            <th><i class="bi bi-person"></i> Name</th>
+                            <th><i class="bi bi-envelope"></i> Email</th>
+                            <th><i class="bi bi-telephone"></i> Phone</th>
+                            <th><i class="bi bi-person-badge"></i> Gender</th>
+                            <th><i class="bi bi-calendar"></i> Enrollment</th>
+                            <th><i class="bi bi-check-circle"></i> Status</th>
+                            <th><i class="bi bi-percent"></i> Attendance</th>
+                            <th><i class="bi bi-gear"></i> Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                            <tr>
+                                <td>
+                                    <strong>{{ student.roll_number }}</strong>
+                                </td>
+                                <td>{{ student.full_name }}</td>
+                                <td>
+                                    <small>{{ student.email }}</small>
+                                </td>
+                                <td>{{ student.phone }}</td>
+                                <td>
+                                    {% if student.gender == 'M' %}
+                                        <span class="badge bg-info">Male</span>
+                                    {% elif student.gender == 'F' %}
+                                        <span class="badge bg-danger">Female</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Other</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <small>{{ student.enrollment_date|date:"M d, Y" }}</small>
+                                </td>
+                                <td>
+                                    {% if student.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge bg-info">{{ student.attendance_percentage }}%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a href="{% url 'core:student_detail' student.roll_number %}" class="btn btn-info" title="View">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="/admin/core/student/{{ student.id }}/change/" class="btn btn-warning" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-3 text-muted">
+                <small><i class="bi bi-info-circle"></i> Showing {{ students|length }} student{{ students|pluralize }}</small>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i>
+                <div>
+                    <strong>No students found.</strong>
+                    {% if search_query %}
+                        <a href="{% url 'core:student_list' %}">Clear search</a>
+                    {% else %}
+                        <p class="mb-0">Start by adding your first student using the button above.</p>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

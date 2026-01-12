@@ -1,0 +1,186 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Reports - Student Tracker{% endblock %}
+{% block page_title %}Reports & Analytics{% endblock %}
+
+{% block content %}
+<!-- TOP PERFORMERS -->
+<div class="row mb-4">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-trophy"></i> Top Performers
+            </div>
+            <div class="card-body">
+                {% if top_performers %}
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Student Name</th>
+                                    <th>Roll Number</th>
+                                    <th>Avg Score</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in top_performers %}
+                                    <tr>
+                                        <td>
+                                            {% if forloop.counter == 1 %}
+                                                <span class="badge bg-warning text-dark" style="font-size: 0.9rem;">
+                                                    <i class="bi bi-trophy-fill"></i> 1st
+                                                </span>
+                                            {% elif forloop.counter == 2 %}
+                                                <span class="badge bg-secondary" style="font-size: 0.9rem;">
+                                                    <i class="bi bi-award"></i> 2nd
+                                                </span>
+                                            {% elif forloop.counter == 3 %}
+                                                <span class="badge bg-danger" style="font-size: 0.9rem;">
+                                                    <i class="bi bi-award"></i> 3rd
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-dark" style="font-size: 0.9rem;">#{{ forloop.counter }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td><strong>{{ student.full_name }}</strong></td>
+                                        <td>{{ student.roll_number }}</td>
+                                        <td>
+                                            {% if student.avg_marks %}
+                                                <span class="badge bg-success">{{ student.avg_marks|floatformat:2 }}</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">N/A</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info mb-0">
+                        <i class="bi bi-info-circle"></i> No performance data available yet.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- LOW ATTENDANCE ALERT -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-exclamation-circle"></i> Low Attendance Alert
+            </div>
+            <div class="card-body">
+                {% if low_attendance %}
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Student Name</th>
+                                    <th>Roll Number</th>
+                                    <th>Attendance %</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in low_attendance %}
+                                    <tr class="table-warning">
+                                        <td><strong>{{ item.student.full_name }}</strong></td>
+                                        <td>{{ item.student.roll_number }}</td>
+                                        <td>{{ item.percentage }}%</td>
+                                        <td>
+                                            {% if item.percentage < 50 %}
+                                                <span class="badge bg-danger"><i class="bi bi-exclamation-triangle"></i> Critical</span>
+                                            {% else %}
+                                                <span class="badge bg-warning text-dark"><i class="bi bi-exclamation"></i> Warning</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-success mb-0">
+                        <i class="bi bi-check-circle"></i> All students have good attendance.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- COURSE-WISE STATISTICS -->
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="bi bi-bar-chart-line"></i> Course-wise Statistics
+    </div>
+    <div class="card-body">
+        {% if course_stats %}
+            <div class="row">
+                {% for stat in course_stats %}
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border-0" style="background: var(--bg-tertiary);">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div>
+                                        <h5 class="card-title mb-1">{{ stat.course.code }}</h5>
+                                        <p class="text-muted mb-0"><small>{{ stat.course.name }}</small></p>
+                                    </div>
+                                    <span class="badge bg-primary">{{ stat.enrolled }} students</span>
+                                </div>
+
+                                <div class="row mt-4">
+                                    <div class="col-6">
+                                        <small class="text-muted d-block mb-2">Avg Performance</small>
+                                        <h4 class="text-success mb-0">
+                                            {{ stat.avg_performance|floatformat:2 }}
+                                        </h4>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted d-block mb-2">Instructor</small>
+                                        <p class="mb-0"><small>{{ stat.course.instructor }}</small></p>
+                                    </div>
+                                </div>
+
+                                <div class="progress mt-4" style="height: 8px;">
+                                    <div class="progress-bar bg-success" role="progressbar" 
+                                         style="width: {% if stat.avg_performance %}{{ stat.avg_performance }}%{% else %}0%{% endif %}" 
+                                         aria-valuenow="{{ stat.avg_performance }}" aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info mb-0">
+                <i class="bi bi-info-circle"></i> No course data available yet.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- EXPORT OPTIONS -->
+<div class="card">
+    <div class="card-header">
+        <i class="bi bi-download"></i> Export & Share
+    </div>
+    <div class="card-body">
+        <div class="d-flex flex-wrap gap-3">
+            <button class="btn btn-primary" onclick="alert('PDF export feature coming soon!')">
+                <i class="bi bi-file-earmark-pdf"></i> Export to PDF
+            </button>
+            <button class="btn btn-success" onclick="alert('Excel export feature coming soon!')">
+                <i class="bi bi-file-earmark-spreadsheet"></i> Export to Excel
+            </button>
+            <button class="btn btn-info" onclick="window.print()">
+                <i class="bi bi-printer"></i> Print Report
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
